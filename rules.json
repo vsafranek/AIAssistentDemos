@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.1",
+
+  "visual": {
+    "default_body_pt": 11.0,
+    "all_caps_threshold": 0.8,
+    "part_font_multiplier": 1.5,
+    "article_font_multiplier": 1.25
+  },
+
+  "numbering": {
+    "order": ["number", "letter", "roman"],
+    "regex": {
+      "number": "^\\s*(\\d+(?:\\.\\d+)*)([.)])\\s+",
+      "letter": "^\\s*([A-Za-z])\\)\\s+",
+      "roman": "^\\s*((?=[MDCLXVI])M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))\\)\\s+",
+
+      "paragraph_number": "^\\((\\d+)\\)\\s+",
+      "bullet_letter": "^([A-Za-z])\\)\\s+"
+    },
+    "normalize_roman_uppercase": true
+  },
+
+
+
+  "section": {
+    "keywords_regex": "^(\\s*)(ČÁST|HLAVA|ODDÍL|PODODDÍL|DÍL|PODDÍL|PŘÍLOHA)\\b",
+    "require_centered": true,
+    "uppercase_ratio_threshold": 0.7,
+    "treat_centered_as_heading": true
+  },
+
+  "article": {
+    "detect_regex": "^(\\s*)(§|Čl\\.?)(\\s*)",
+    "normalize_nbsp": true,
+    "classify_heading_segments": true
+  },
+
+  "heading_outside_article": {
+    "apply_rules": false,
+    "label": "heading_text",
+    "whitelist_titles": [],
+    "blacklist_titles": []
+  },
+
+  "color_map": {
+    "ff0000": "red",
+    "0066cc": "blue",
+    "default": "black",
+    "tolerance": {
+      "use_hsv_buckets": false,
+      "red_hue_range": [345, 15],
+      "blue_hue_range": [200, 250],
+      "sat_min": 0.3,
+      "val_min": 0.3
+    }
+  },
+
+  "classification": {
+    "priority": ["double_strike", "strike", "bold"],
+    "rules": [
+      { "when": {"color": "black", "bold": true,  "strike": false, "double_strike": false}, "label": "proposer_new " },
+      { "when": {"color": "black", "bold": false, "strike": true,  "double_strike": false}, "label": "proposer_removed_valid" },
+      { "when": {"color": "black", "bold": false, "strike": false, "double_strike": false}, "label": "valid_text" },
+
+      { "when": {"color": "black",   "bold": true,  "strike": false,  "double_strike": true},  "label": "ps_removed_proposer" },
+      { "when": {"color": "red",   "bold": true,  "strike": true,  "double_strike": true},  "label": "ps_removed_proposer" },
+      { "when": {"color": "red",   "bold": true,  "strike": false, "double_strike": false}, "label": "ps_new" },
+      { "when": {"color": "red",   "bold": false, "strike": true,  "double_strike": false}, "label": "ps_removed_valid" },
+
+      { "when": {"color": "blue",  "bold": true,  "strike": true,  "double_strike": true},  "label": "senate_removed_proposer" },
+      { "when": {"color": "blue",  "bold": true,  "strike": false, "double_strike": false}, "label": "senate_new" },
+      { "when": {"color": "blue",  "bold": true, "strike": true,  "double_strike": false}, "label": "senate_removed_ps" },
+      { "when": {"color": "blue",  "bold": false, "strike": true,  "double_strike": false}, "label": "senate_removed_valid" }
+    ],
+    "fallback_label": "unknown"
+  },
+
+  "label_layer_map": {
+    "proposer_new": { "layer": "proposer", "effect": "add" },
+    "proposer_removed_valid": { "layer": "proposer", "effect": "delete" },
+    "ps_new": { "layer": "ps", "effect": "add" },
+    "ps_removed_valid": { "layer": "ps", "effect": "delete" },
+    "ps_removed_proposer":{ "layer": "ps", "effect": "proposer_counter" },
+    "senate_new": { "layer": "senate", "effect": "add" },
+    "senate_removed_valid":{ "layer": "senate", "effect": "delete" },
+    "senate_removed_proposer":{ "layer": "senate", "effect": "proposer_counter" },
+    "senate_removed_ps":{ "layer": "senate", "effect": "ps_counter" },
+    "valid_text": { "layer": "base", "effect": "neutral" },
+    "heading_text": { "layer": "base", "effect": "neutral" },
+    "unknown": { "layer": "base", "effect": "neutral" }
+  },
+  "label_layer_fallback": { "layer": "base", "effect": "neutral" },
+
+
+  "numbering": {
+    "order": ["number", "letter", "roman"],
+    "regex": {
+      "number": "^\\s*(\\d+(?:\\.\\d+)*)([.)])\\s+",
+      "letter": "^\\s*([A-Za-z])\\)\\s+",
+      "roman": "^\\s*((?=[MDCLXVI])M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))\\)\\s+"
+    },
+    "normalize_roman_uppercase": true
+  },
+
+  "normalization": {
+    "collapse_internal_spaces": false,
+    "convert_nbsp_to_space": true,
+    "replace_soft_break_with_space": true
+  },
+
+  "merging": {
+    "merge_on_same": ["label", "bold", "strike", "double_strike", "color"],
+    "keep_alignment_out_of_key": true
+  }
+}
